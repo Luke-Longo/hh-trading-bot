@@ -26,5 +26,7 @@ export type { IUniswapV2Factory } from "./contracts/interfaces/IUniswapV2Factory
 export { IUniswapV2Factory__factory } from "./factories/contracts/interfaces/IUniswapV2Factory__factory";
 export type { IUniswapV2Pair } from "./contracts/interfaces/IUniswapV2Pair";
 export { IUniswapV2Pair__factory } from "./factories/contracts/interfaces/IUniswapV2Pair__factory";
+export type { IWeth } from "./contracts/interfaces/IWeth";
+export { IWeth__factory } from "./factories/contracts/interfaces/IWeth__factory";
 export type { Migrations } from "./contracts/Migrations";
 export { Migrations__factory } from "./factories/contracts/Migrations__factory";

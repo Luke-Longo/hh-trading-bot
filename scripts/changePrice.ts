@@ -8,8 +8,8 @@ import { Token } from "@uniswap/sdk"
 import { abi as UniswapV2Router02ABI } from "@uniswap/v2-periphery/build/IUniswapV2Router02.json"
 import { abi as UniswapV2FactoryABI } from "@uniswap/v2-core/build/IUniswapV2Factory.json"
 import { abi as IERC20ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json"
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
-import { IUniswapV2Factory, IUniswapV2Router02, IUniswapV2ERC20, IERC20 } from "../typechain"
+import { abi as IWETHABI } from "../artifacts/contracts/interfaces/IWETH.sol/IWETH.json"
+import { IUniswapV2Factory, IUniswapV2Router02, IUniswapV2ERC20, IERC20, IWeth } from "../typechain"
 // -- SETUP NETWORK & WEB3 -- //
 
 const chainId = 1
@@ -69,7 +69,7 @@ const GAS = 450000
 
 const ERC20_CONTRACT = new ethers.Contract(ERC20_ADDRESS!, IERC20ABI, provider) as IUniswapV2ERC20
 
-const WETH_CONTRACT = new ethers.Contract(WETH_ADDRESS!, IERC20ABI, provider) as IUniswapV2ERC20
+const WETH_CONTRACT = new ethers.Contract(WETH_ADDRESS!, IWETHABI, provider) as IWeth
 
 // -- MAIN SCRIPT -- //
 
@@ -144,17 +144,27 @@ async function manipulatePrice(tokens: Token[], account0: Wallet) {
 
     const path = [tokens[0].address, tokens[1].address]
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20 // 20 minutes
+
     await ERC20_CONTRACT.connect(account1).approve(V2_ROUTER_TO_USE.address, amountIn, {
         gasLimit: GAS,
     })
+
     console.log(`Approved ${tokens[0].symbol} for swap\n`)
     // .send({ from: UNLOCKED_ACCOUNT})
     // await ERC20_CONTRACT.transfer(UNLOCKED_ACCOUNT, amountIn)
     // need to swap tokens to make sure there is enough SHIB in wallet to transfer to account0
-    const againstBalance = await ERC20_CONTRACT.balanceOf(account1.address)
-    const forBalance = await WETH_CONTRACT.balanceOf(account1.address)
 
-    console.log("forBalance", forBalance.toString())
+    // deposit weth into WETH contract
+    const tx = await WETH_CONTRACT.connect(account1).deposit({
+        value: ethers.utils.parseEther("10"),
+        gasLimit: GAS,
+    })
+    await tx.wait(1)
+
+    const againstBalance = await ERC20_CONTRACT.balanceOf(account1.address)
+    const wethBalance = await WETH_CONTRACT.balanceOf(account1.address)
+
+    console.log("wethBalance", wethBalance.toString())
     console.log("againstBalance", againstBalance.toString())
 
     await ERC20_CONTRACT.connect(account1).transfer(account1.address, amountIn, {

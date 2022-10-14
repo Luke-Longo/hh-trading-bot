@@ -6,3 +6,4 @@ export { IUniswapV2ERC20__factory } from "./IUniswapV2ERC20__factory";
 export { IUniswapV2Factory__factory } from "./IUniswapV2Factory__factory";
 export { IUniswapV2Pair__factory } from "./IUniswapV2Pair__factory";
 export { IUniswapV2Router01__factory } from "./IUniswapV2Router01__factory";
+export { IWeth__factory } from "./IWeth__factory";

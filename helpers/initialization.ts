@@ -5,7 +5,7 @@ import config from "../config.json"
 
 import { ethers, Signer, Wallet } from "ethers"
 import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers"
-import { IUniswapV2Factory, IUniswapV2Router02, Arbitrage } from "../typechain"
+import { IUniswapV2Factory, IUniswapV2Router02, Arbitrage, IWeth } from "../typechain"
 
 import { abi as ArbitrageABI } from "../artifacts/contracts/Arbitrage.sol/Arbitrage.json"
 import { abi as IUniswapV2Router02ABI } from "@uniswap/v2-periphery/build/IUniswapV2Router02.json"
