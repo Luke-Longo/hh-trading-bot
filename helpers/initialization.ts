@@ -16,16 +16,13 @@ export let provider: JsonRpcProvider, wallet: Wallet, signer: Signer
 
 if (!PROJECT_SETTINGS.isLocal) {
     provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC_URL)
-    console.log("provider", provider)
     wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider)
-    console.log("wallet", wallet)
 } else {
     // this is were you will need to establish a connection to your local node
     // this may or may not work
     provider = new ethers.providers.JsonRpcProvider("http://localhost:8545")
     console.log("local provider", provider)
     wallet = new ethers.Wallet(process.env.PRIVATE_KEY!).connect(provider)
-    console.log(wallet)
 }
 
 export const uFactory = new ethers.Contract(
@@ -53,5 +50,3 @@ export const sRouter = new ethers.Contract(
 ) as IUniswapV2Router02 // SUSHISWAP ROUTER CONTRACT
 
 export const arbitrage = new ethers.Contract(arbitrageAddress, ArbitrageABI, provider) as Arbitrage
-
-console.log("arbitrage", arbitrage)
