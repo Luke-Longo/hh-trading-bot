@@ -109,11 +109,11 @@ export async function getEstimatedReturn(
 ) {
     console.log("getting estimated return")
     const trade1 = await _routerPath[0].getAmountsOut(amount, [_token0.address, _token1.address])
-
     const trade2 = await _routerPath[1].getAmountsOut(trade1[1], [_token1.address, _token0.address])
-
+    console.log("Available Trades\n")
+    console.log("Trade 1", trade1, "\n")
+    console.log("Trade 2", trade2, "\n")
     const amountIn = Number(await ethers.utils.parseUnits(trade1[0].toString(), "ether"))
     const amountOut = Number(await ethers.utils.parseUnits(trade2[1].toString(), "ether"))
-
     return { amountIn, amountOut }
 }

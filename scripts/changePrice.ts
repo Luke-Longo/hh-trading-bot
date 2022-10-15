@@ -2,7 +2,7 @@
 import * as dotenv from "dotenv"
 
 dotenv.config()
-import { ethers } from "hardhat"
+import { ethers, getNamedAccounts, network } from "hardhat"
 import { Token } from "@uniswap/sdk"
 
 import { abi as UniswapV2Router02ABI } from "@uniswap/v2-periphery/build/IUniswapV2Router02.json"
@@ -12,8 +12,7 @@ import { abi as IWETHABI } from "../artifacts/contracts/interfaces/IWETH.sol/IWE
 import { IUniswapV2Factory, IUniswapV2Router02, IUniswapV2ERC20, IERC20, IWeth } from "../typechain"
 // -- SETUP NETWORK & WEB3 -- //
 
-const chainId = 1
-
+const chainId = network.config.chainId
 const provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC_URL)
 
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider)
@@ -74,7 +73,7 @@ const WETH_CONTRACT = new ethers.Contract(WETH_ADDRESS!, IWETHABI, provider) as 
 // -- MAIN SCRIPT -- //
 
 const main = async () => {
-    const accounts = await ethers.getSigners()
+    const accounts = await getNamedAccounts()
     const account = wallet // accounts[1] This will be the account to recieve WETH after we perform the swap to manipulate price
 
     const pairContract = await getPairContract(V2_FACTORY_TO_USE, ERC20_ADDRESS!, WETH_ADDRESS!)
@@ -133,10 +132,14 @@ main()
 async function manipulatePrice(tokens: Token[], account0: Wallet) {
     console.log(`\nBeginning Swap...\n`)
 
-    console.log(`Input Token: ${tokens[0].symbol}`)
+    console.log(`Input Token: ${tokens[0].symbol}\n`)
     console.log(`Output Token: ${tokens[1].symbol}\n`)
     const accounts = await ethers.getSigners()
-    const account1 = accounts[1]
+    const account1 = accounts[1] // this will be the account to swap shib to weth
+
+    const ethAmount = ethers.utils.parseUnits("1000000", "ether")
+    console.log("ethAmount", ethAmount._hex)
+    await network.provider.send("hardhat_setBalance", [account1.address, ethAmount._hex])
 
     // const amountIn = new web3.utils.BN(web3.utils.toWei(AMOUNT, "ether"))
     const amountIn = await ethers.utils.parseUnits(AMOUNT, "ether")
@@ -150,11 +153,9 @@ async function manipulatePrice(tokens: Token[], account0: Wallet) {
     })
 
     console.log(`Approved ${tokens[0].symbol} for swap\n`)
-    // .send({ from: UNLOCKED_ACCOUNT})
-    // await ERC20_CONTRACT.transfer(UNLOCKED_ACCOUNT, amountIn)
+
     // need to swap tokens to make sure there is enough SHIB in wallet to transfer to account0
 
-    // deposit weth into WETH contract
     const tx = await WETH_CONTRACT.connect(account1).deposit({
         value: ethers.utils.parseEther("10"),
         gasLimit: GAS,
@@ -188,3 +189,8 @@ async function manipulatePrice(tokens: Token[], account0: Wallet) {
 
     return receipt
 }
+
+// await hre.network.provider.request({
+//     method: "hardhat_impersonateAccount",
+//     params: ["0x364d6D0333432C3Ac016Ca832fb8594A8cE43Ca6"],
+// })

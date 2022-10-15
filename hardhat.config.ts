@@ -31,6 +31,7 @@ const config: HardhatUserConfig = {
     networks: {
         hardhat: {
             // If you want to do some forking set `enabled` to true
+            hardfork: "merge",
             forking: {
                 url: MAINNET_RPC_URL,
                 // blockNumber: Number(FORKING_BLOCK_NUMBER),

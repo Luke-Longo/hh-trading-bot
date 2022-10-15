@@ -23,11 +23,9 @@ import {
     sRouter,
     provider,
     wallet,
-    signer,
     arbitrage,
 } from "./helpers/initialization"
 import { ethers } from "ethers"
-import { BigNumber } from "ethers"
 import { Token } from "@uniswap/sdk"
 
 // -- .ENV VALUES HERE -- //

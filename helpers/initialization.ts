@@ -2,6 +2,7 @@ import * as dotenv from "dotenv"
 dotenv.config()
 import { arbitrageAddress } from "../constants"
 import config from "../config.json"
+import { PROJECT_SETTINGS } from "../helper-hardhat-config"
 
 import { ethers, Signer, Wallet } from "ethers"
 import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers"
@@ -13,15 +14,16 @@ import { abi as IUniswapV2FactoryABI } from "@uniswap/v2-core/build/IUniswapV2Fa
 
 export let provider: JsonRpcProvider, wallet: Wallet, signer: Signer
 
-if (!config.PROJECT_SETTINGS.isLocal) {
+if (!PROJECT_SETTINGS.isLocal) {
     provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC_URL)
-    console.log("provider not local", provider)
+    console.log("provider", provider)
     wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider)
-    console.log("wallet not local", wallet)
+    console.log("wallet", wallet)
 } else {
+    // this is were you will need to establish a connection to your local node
     // this may or may not work
     provider = new ethers.providers.JsonRpcProvider("http://localhost:8545")
-    console.log("provider", provider)
+    console.log("local provider", provider)
     wallet = new ethers.Wallet(process.env.PRIVATE_KEY!).connect(provider)
     console.log(wallet)
 }
