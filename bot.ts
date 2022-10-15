@@ -235,6 +235,8 @@ const determineProfitability = async (
         const account = await wallet.getAddress()
 
         let ethBalanceBefore = await provider.getBalance(account)
+        console.log(`Raw Value: ${ethBalanceBefore}\n`)
+        console.log(`ETH Balance Before: ${ethers.utils.formatEther(ethBalanceBefore)}\n`)
         ethBalanceBefore = ethers.utils.parseUnits(ethBalanceBefore.toString(), "ether")
         const ethBalanceAfter = ethBalanceBefore.toNumber() - Number(estimatedGasCost)
 
