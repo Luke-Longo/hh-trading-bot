@@ -260,15 +260,15 @@ const determineProfitability = async (
         const totalGained = wethBalanceDifference.sub(ethers.utils.parseEther(estimatedGasCost))
 
         const data = {
-            "ETH Balance Before": ethBalanceBefore.toString(),
-            "ETH Balance After": ethBalanceAfter.toString(),
-            "ETH Spent (gas)": estimatedGasCost.toString(),
+            "ETH Balance Before": ethers.utils.formatEther(ethBalanceBefore.toString()),
+            "ETH Balance After": ethers.utils.formatEther(ethBalanceAfter.toString()),
+            "ETH Spent (gas)": ethers.utils.formatEther(estimatedGasCost.toString()),
             "-": {},
-            "WETH Balance BEFORE": wethBalanceBefore.toString(),
-            "WETH Balance AFTER": wethBalanceAfter.toString(),
-            "WETH Gained/Lost": wethBalanceDifference.toString(),
-            _: {},
-            "Total Gained/Lost": totalGained.toString(),
+            "WETH Balance BEFORE": ethers.utils.formatEther(wethBalanceBefore.toString()),
+            "WETH Balance AFTER": ethers.utils.formatEther(wethBalanceAfter.toString()),
+            "WETH Gained/Lost": ethers.utils.formatEther(wethBalanceDifference.toString()),
+            "--": {},
+            "Total Gained/Lost": ethers.utils.formatEther(totalGained.toString()),
         }
 
         console.table(data)
@@ -325,24 +325,21 @@ const executeTrade = async (
     const balanceAfter = await _token0Contract.balanceOf(account)
     const ethBalanceAfter = await provider.getBalance(account)
 
-    const balanceDifference = balanceAfter.toNumber() - balanceBefore.toNumber()
-    const totalSpent = ethBalanceBefore.toNumber() - ethBalanceAfter.toNumber()
-
+    const balanceDifference = balanceAfter.sub(balanceBefore)
+    const totalSpent = ethBalanceBefore.sub(ethBalanceAfter)
     const data = {
-        "ETH Balance Before": ethers.utils.parseUnits(ethBalanceBefore.toString(), "ether"),
-        "ETH Balance After": ethers.utils.parseUnits(ethBalanceAfter.toString(), "ether"),
-        "ETH Spent (gas)": ethers.utils.parseUnits(
-            (ethBalanceBefore.toNumber() - ethBalanceAfter.toNumber()).toString(),
-            "ether"
+        "ETH Balance Before": ethers.utils.formatEther(ethBalanceBefore.toString()),
+        "ETH Balance After": ethers.utils.formatEther(ethBalanceAfter.toString()),
+        "ETH Spent (gas)": ethers.utils.formatEther(
+            ethBalanceBefore.sub(ethBalanceAfter).toString()
         ),
         "-": {},
-        "WETH Balance BEFORE": ethers.utils.parseUnits(balanceBefore.toString(), "ether"),
-        "WETH Balance AFTER": ethers.utils.parseUnits(balanceAfter.toString(), "ether"),
-        "WETH Gained/Lost": ethers.utils.parseUnits(balanceDifference.toString(), "ether"),
-        _: {},
-        "Total Gained/Lost": `${ethers.utils.parseUnits(
-            (balanceDifference - totalSpent).toString(),
-            "ether"
+        "WETH Balance BEFORE": ethers.utils.formatEther(balanceBefore.toString()),
+        "WETH Balance AFTER": ethers.utils.formatEther(balanceAfter.toString()),
+        "WETH Gained/Lost": ethers.utils.formatEther(balanceDifference.toString()),
+        "--": {},
+        "Total Gained/Lost": `${ethers.utils.formatEther(
+            balanceDifference.sub(totalSpent).toString()
         )} ETH`,
     }
 
