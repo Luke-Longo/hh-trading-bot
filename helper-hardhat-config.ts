@@ -86,6 +86,7 @@ export const VERIFICATION_BLOCK_CONFIRMATIONS = 6
 export const PROJECT_SETTINGS = {
     isLocal: false,
     isDeployed: false,
+    localUrl: "http://127.0.0.1:8545/",
 }
 export const UNISWAP = {
     V2_ROUTER_02_ADDRESS: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
