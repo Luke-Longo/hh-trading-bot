@@ -3,9 +3,8 @@ dotenv.config()
 import { arbitrageAddress } from "../constants"
 import config from "../config.json"
 import { PROJECT_SETTINGS } from "../helper-hardhat-config"
-
 import { ethers, Signer, Wallet } from "ethers"
-import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers"
+import { JsonRpcProvider } from "@ethersproject/providers"
 import { IUniswapV2Factory, IUniswapV2Router02, Arbitrage, IWeth } from "../typechain"
 
 import { abi as ArbitrageABI } from "../artifacts/contracts/Arbitrage.sol/Arbitrage.json"
@@ -18,12 +17,17 @@ if (!PROJECT_SETTINGS.isLocal) {
     provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC_URL)
     wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider)
 } else {
-    // this is were you will need to establish a connection to your local node
-    // this may or may not work
-    provider = new ethers.providers.JsonRpcProvider("http://localhost:8545")
-    console.log("local provider", provider)
-    wallet = new ethers.Wallet(process.env.PRIVATE_KEY!).connect(provider)
+    provider = new ethers.providers.JsonRpcProvider(PROJECT_SETTINGS.localUrl)
+    console.log("provider: " + provider)
+    wallet = new ethers.Wallet(PROJECT_SETTINGS.localPrivateKey, provider)
 }
+
+const getBalance = async () => {
+    const balance = ethers.utils.formatEther(await wallet.getBalance())
+    console.log("balance: " + balance)
+}
+
+getBalance()
 
 export const uFactory = new ethers.Contract(
     config.UNISWAP.FACTORY_ADDRESS,
