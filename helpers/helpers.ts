@@ -113,7 +113,7 @@ export async function getEstimatedReturn(
     console.log("Available Trades\n")
     console.log("Trade 1", trade1, "\n")
     console.log("Trade 2", trade2, "\n")
-    const amountIn = Number(await ethers.utils.parseUnits(trade1[0].toString(), "ether"))
-    const amountOut = Number(await ethers.utils.parseUnits(trade2[1].toString(), "ether"))
+    const amountIn: BigNumber = await ethers.utils.parseUnits(trade1[0].toString(), "ether")
+    const amountOut: BigNumber = await ethers.utils.parseUnits(trade2[1].toString(), "ether")
     return { amountIn, amountOut }
 }

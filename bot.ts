@@ -242,19 +242,19 @@ const determineProfitability = async (
         const account = await wallet.getAddress()
 
         let ethBalanceBefore = await provider.getBalance(account)
-        console.log(`Raw Value: ${ethBalanceBefore}\n`)
         console.log(`ETH Balance Before: ${ethers.utils.formatEther(ethBalanceBefore)}\n`)
-        ethBalanceBefore = ethers.utils.parseUnits(ethBalanceBefore.toString(), "ether")
-        const ethBalanceAfter = ethBalanceBefore.toNumber() - Number(estimatedGasCost)
+        console.log("Estimated Gas Cost", estimatedGasCost)
+        const ethBalanceAfter = ethBalanceBefore.sub(ethers.utils.parseEther(estimatedGasCost))
+        console.log(`ETH Balance After Transaction: ${ethers.utils.formatEther(ethBalanceAfter)}\n`)
 
-        const amountDifference = amountOut - amountIn
+        const amountDifference = amountOut.sub(amountIn)
         let wethBalanceBefore = await _token0Contract.balanceOf(account)
         wethBalanceBefore = ethers.utils.parseUnits(wethBalanceBefore.toString(), "ether")
 
-        const wethBalanceAfter = amountDifference + Number(wethBalanceBefore)
-        const wethBalanceDifference = wethBalanceAfter - Number(wethBalanceBefore)
+        const wethBalanceAfter = amountDifference.add(wethBalanceBefore)
+        const wethBalanceDifference = wethBalanceAfter.sub(wethBalanceBefore)
 
-        const totalGained = wethBalanceDifference - Number(estimatedGasCost)
+        const totalGained = wethBalanceDifference.sub(estimatedGasCost)
 
         const data = {
             "ETH Balance Before": ethBalanceBefore,
