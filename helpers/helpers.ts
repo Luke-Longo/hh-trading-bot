@@ -2,18 +2,15 @@ import * as dotenv from "dotenv"
 
 dotenv.config()
 
-import config from "../config.json"
-
 import { ethers } from "hardhat"
+import { PROJECT_SETTINGS, SUSHISWAP, UNISWAP } from "../helper-hardhat-config"
 
 export let provider: JsonRpcProvider
-if (!config.PROJECT_SETTINGS.isLocal) {
+if (!PROJECT_SETTINGS.isLocal) {
     provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC_URL)
-    console.log("provider", provider.connection.url)
 } else {
     // this may or may not work
-    provider = new ethers.providers.JsonRpcProvider("http://localhost:8545")
-    console.log("Local provider", provider.connection.url)
+    provider = new ethers.providers.JsonRpcProvider(PROJECT_SETTINGS.localUrl)
 }
 
 import { ChainId, Token } from "@uniswap/sdk"

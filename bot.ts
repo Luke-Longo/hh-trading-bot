@@ -1,12 +1,8 @@
 // -- HANDLE INITIAL SETUP -- //
-
 import "./helpers/server"
 import * as dotenv from "dotenv"
-
 dotenv.config()
-
-import config from "./config.json"
-
+import { PROJECT_SETTINGS } from "./helper-hardhat-config"
 import { IUniswapV2Pair, IUniswapV2ERC20, IUniswapV2Factory, IUniswapV2Router02 } from "./typechain"
 import {
     getTokenAndContract,
@@ -244,11 +240,11 @@ const determineProfitability = async (
         // Fetch account
         const account = await wallet.getAddress()
 
-        let ethBalanceBefore = await provider.getBalance(account)
-        console.log(`ETH Balance Before: ${ethers.utils.formatEther(ethBalanceBefore)}\n`)
+        let weiBalanceBefore = await provider.getBalance(account)
+        console.log(`ETH Balance Before: ${ethers.utils.formatEther(weiBalanceBefore)}\n`)
         console.log("Estimated Gas Cost", estimatedGasCost)
-        const ethBalanceAfter = ethBalanceBefore.sub(ethers.utils.parseEther(estimatedGasCost))
-        console.log(`ETH Balance After Transaction: ${ethers.utils.formatEther(ethBalanceAfter)}\n`)
+        const weiBalanceAfter = weiBalanceBefore.sub(ethers.utils.parseEther(estimatedGasCost))
+        console.log(`WEI Balance After Transaction: ${weiBalanceAfter}\n`)
 
         const amountDifference = amountOut.sub(amountIn)
         let wethBalanceBefore = await _token0Contract.balanceOf(account)
@@ -260,9 +256,9 @@ const determineProfitability = async (
         const totalGained = wethBalanceDifference.sub(ethers.utils.parseEther(estimatedGasCost))
 
         const data = {
-            "ETH Balance Before": ethers.utils.formatEther(ethBalanceBefore.toString()),
-            "ETH Balance After": ethers.utils.formatEther(ethBalanceAfter.toString()),
-            "ETH Spent (gas)": ethers.utils.formatEther(estimatedGasCost.toString()),
+            "ETH Balance Before": ethers.utils.formatEther(weiBalanceBefore.toString()),
+            "ETH Balance After": ethers.utils.formatEther(weiBalanceAfter.toString()),
+            "ETH Spent (gas)": estimatedGasCost.toString(),
             "-": {},
             "WETH Balance BEFORE": ethers.utils.formatEther(wethBalanceBefore.toString()),
             "WETH Balance AFTER": ethers.utils.formatEther(wethBalanceAfter.toString()),
@@ -311,7 +307,7 @@ const executeTrade = async (
     const balanceBefore = await _token0Contract.balanceOf(account)
     const ethBalanceBefore = await provider.getBalance(account)
 
-    if (config.PROJECT_SETTINGS.isDeployed) {
+    if (PROJECT_SETTINGS.isDeployed) {
         await arbitrage
             .connect(wallet)
             .executeTrade(startOnUniswap, _token0Contract.address, _token1Contract.address, amount)

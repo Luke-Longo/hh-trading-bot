@@ -1,8 +1,7 @@
 import * as dotenv from "dotenv"
 dotenv.config()
 import { arbitrageAddress } from "../constants"
-import config from "../config.json"
-import { PROJECT_SETTINGS } from "../helper-hardhat-config"
+import { PROJECT_SETTINGS, UNISWAP, SUSHISWAP } from "../helper-hardhat-config"
 import { ethers, Signer, Wallet } from "ethers"
 import { JsonRpcProvider } from "@ethersproject/providers"
 import { IUniswapV2Factory, IUniswapV2Router02, Arbitrage, IWeth } from "../typechain"
@@ -30,25 +29,25 @@ const getBalance = async () => {
 getBalance()
 
 export const uFactory = new ethers.Contract(
-    config.UNISWAP.FACTORY_ADDRESS,
+    UNISWAP.FACTORY_ADDRESS,
     IUniswapV2FactoryABI,
     provider
 ) as IUniswapV2Factory // UNISWAP FACTORY CONTRACT
 
 export const uRouter = new ethers.Contract(
-    config.UNISWAP.V2_ROUTER_02_ADDRESS,
+    UNISWAP.V2_ROUTER_02_ADDRESS,
     IUniswapV2Router02ABI,
     provider
 ) as IUniswapV2Router02 // UNISWAP ROUTER CONTRACT
 
 export const sFactory = new ethers.Contract(
-    config.SUSHISWAP.FACTORY_ADDRESS,
+    SUSHISWAP.FACTORY_ADDRESS,
     IUniswapV2FactoryABI,
     provider
 ) as IUniswapV2Factory // SUSHISWAP FACTORY CONTRACT
 
 export const sRouter = new ethers.Contract(
-    config.SUSHISWAP.V2_ROUTER_02_ADDRESS,
+    SUSHISWAP.V2_ROUTER_02_ADDRESS,
     IUniswapV2Router02ABI,
     provider
 ) as IUniswapV2Router02 // SUSHISWAP ROUTER CONTRACT
