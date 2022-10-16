@@ -93,7 +93,7 @@ const main = async () => {
     sPair.on("Swap", async () => {
         if (!isExecuting) {
             isExecuting = true
-
+            // Error occurs since sushiswap has less reserves than uniswap so if
             const priceDifference = await checkPrice("Sushiswap", token0, token1)
             const routerPath = await determineDirection(priceDifference)
 
@@ -257,7 +257,7 @@ const determineProfitability = async (
         const wethBalanceAfter = amountDifference.add(wethBalanceBefore)
         const wethBalanceDifference = wethBalanceAfter.sub(wethBalanceBefore)
 
-        const totalGained = wethBalanceDifference.sub(estimatedGasCost)
+        const totalGained = wethBalanceDifference.sub(ethers.utils.parseEther(estimatedGasCost))
 
         const data = {
             "ETH Balance Before": ethBalanceBefore,
