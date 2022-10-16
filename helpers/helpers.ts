@@ -26,6 +26,7 @@ import {
     IUniswapV2Router02,
 } from "../typechain"
 import { JsonRpcProvider } from "@ethersproject/providers"
+import { BigNumber } from "ethers"
 
 export async function getTokenAndContract(_token0Address: string, _token1Address: string) {
     console.log("getTokenAndContract")
@@ -74,7 +75,6 @@ export async function getPairContract(
     _token0: string,
     _token1: string
 ) {
-    console.log("getPairContract")
     const pairAddress = await getPairAddress(_V2Factory, _token0, _token1)
     const pairContract = (await new ethers.Contract(
         pairAddress,

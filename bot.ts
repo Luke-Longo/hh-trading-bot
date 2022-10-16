@@ -15,7 +15,7 @@ import {
     getEstimatedReturn,
     getReserves,
 } from "./helpers/helpers"
-
+import { BigNumber } from "ethers"
 import {
     uFactory,
     uRouter,
@@ -179,7 +179,7 @@ const determineProfitability = async (
     // This is where you can customize your conditions on whether a profitable trade is possible.
     // This is a basic example of trading WETH/SHIB...
 
-    let reserves, exchangeToBuy, exchangeToSell
+    let reserves: BigNumber[], exchangeToBuy: string, exchangeToSell: string
     // checking to see which path is being used
     if (_routerPath[0].address == uRouter.address) {
         reserves = await getReserves(sPair)
@@ -201,6 +201,7 @@ const determineProfitability = async (
 
     try {
         // This returns the amount of WETH needed
+        console.log("Getting amounts in")
         let result = await _routerPath[0].getAmountsIn(reserves[0], [
             _token0.address,
             _token1.address,
@@ -208,8 +209,14 @@ const determineProfitability = async (
 
         const token0In: string = result[0].toString() // WETH
         const token1In: string = result[1].toString() // SHIB
+
+        console.log(`Token 0 (WETH) in ${token0In}\n`)
+        console.log(`Token 1 (SHIB) in ${token1In}\n`)
+
         // get amounts out factors in the slippage
         result = await _routerPath[1].getAmountsOut(token1In, [_token1.address, _token0.address])
+
+        console.log(`Amounts out result: ${result}`)
 
         console.log(
             `Estimated amount of WETH needed to buy enough ${tickerFor} on ${exchangeToBuy}\t\t| ${ethers.utils.parseUnits(
