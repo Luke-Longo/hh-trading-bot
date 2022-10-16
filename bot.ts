@@ -260,19 +260,18 @@ const determineProfitability = async (
         const totalGained = wethBalanceDifference.sub(ethers.utils.parseEther(estimatedGasCost))
 
         const data = {
-            "ETH Balance Before": ethBalanceBefore,
-            "ETH Balance After": ethBalanceAfter,
-            "ETH Spent (gas)": estimatedGasCost,
+            "ETH Balance Before": ethBalanceBefore.toString(),
+            "ETH Balance After": ethBalanceAfter.toString(),
+            "ETH Spent (gas)": estimatedGasCost.toString(),
             "-": {},
-            "WETH Balance BEFORE": wethBalanceBefore,
-            "WETH Balance AFTER": wethBalanceAfter,
-            "WETH Gained/Lost": wethBalanceDifference,
+            "WETH Balance BEFORE": wethBalanceBefore.toString(),
+            "WETH Balance AFTER": wethBalanceAfter.toString(),
+            "WETH Gained/Lost": wethBalanceDifference.toString(),
             _: {},
-            "Total Gained/Lost": totalGained,
+            "Total Gained/Lost": totalGained.toString(),
         }
 
         console.table(data)
-        console.log()
 
         if (amountOut < amountIn) {
             return false
