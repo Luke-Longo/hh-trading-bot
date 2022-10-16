@@ -202,9 +202,8 @@ const determineProfitability = async (
     try {
         // This returns the amount of WETH needed
         console.log("Getting amounts in")
-        console.log(`ROUTER PATH: ${_routerPath}\n`)
-        console.log(`Router Path 0: ${_routerPath[0]}\n`)
-        console.log(`Router Path 1: ${_routerPath[1]}\n`)
+        console.log(`${_routerPath[0].address} --> ${_routerPath[1].address}\n`)
+        _routerPath[0]
         let result = await _routerPath[0].getAmountsIn(reserves[0], [
             _token0.address,
             _token1.address,
