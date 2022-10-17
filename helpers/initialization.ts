@@ -10,7 +10,7 @@ import { abi as ArbitrageABI } from "../artifacts/contracts/Arbitrage.sol/Arbitr
 import { abi as IUniswapV2Router02ABI } from "@uniswap/v2-periphery/build/IUniswapV2Router02.json"
 import { abi as IUniswapV2FactoryABI } from "@uniswap/v2-core/build/IUniswapV2Factory.json"
 
-export let provider: JsonRpcProvider, wallet: Wallet, signer: Signer
+export let provider: JsonRpcProvider, wallet: Wallet, signer: Signer, wallet2: Wallet
 
 if (!PROJECT_SETTINGS.isLocal) {
     provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC_URL)
@@ -19,6 +19,7 @@ if (!PROJECT_SETTINGS.isLocal) {
     provider = new ethers.providers.JsonRpcProvider(PROJECT_SETTINGS.localUrl)
     console.log("provider: " + provider)
     wallet = new ethers.Wallet(PROJECT_SETTINGS.localPrivateKey, provider)
+    wallet2 = new ethers.Wallet(PROJECT_SETTINGS.account2PrivateKey, provider)
 }
 
 const getBalance = async () => {

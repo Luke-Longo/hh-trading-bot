@@ -8,12 +8,19 @@ import { Token } from "@uniswap/sdk"
 import { abi as IERC20ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json"
 import { abi as IWETHABI } from "../artifacts/contracts/interfaces/IWETH.sol/IWETH.json"
 import { IUniswapV2ERC20, IWeth } from "../typechain"
-import { provider, uFactory, sFactory, uRouter, sRouter } from "../helpers/initialization"
+import {
+    provider,
+    uFactory,
+    sFactory,
+    uRouter,
+    sRouter,
+    wallet,
+    wallet2,
+} from "../helpers/initialization"
 import { PROJECT_SETTINGS, UNISWAP, SUSHISWAP } from "../helper-hardhat-config"
 // -- SETUP NETWORK & WEB3 -- //
 
 const chainId = 1
-const wallet = new Wallet(PROJECT_SETTINGS.localPrivateKey, provider)
 
 // -- IMPORT HELPER FUNCTIONS -- //
 
@@ -47,8 +54,7 @@ const WETH_CONTRACT = new ethers.Contract(WETH_ADDRESS!, IWETHABI, provider) as 
 
 const main = async () => {
     const accounts = await getNamedAccounts()
-    const account = wallet // accounts[1] This will be the account to recieve WETH after we perform the swap to manipulate price
-
+    // accounts[1] This will be the account to recieve WETH after we perform the swap to manipulate price
     const pairContract = await getPairContract(V2_FACTORY_TO_USE, ERC20_ADDRESS!, WETH_ADDRESS!)
     console.log(`Received pair contract\n`)
 
@@ -73,7 +79,7 @@ const main = async () => {
     const priceBefore = await calculatePrice(pairContract)
     console.log(`Price before swap: ${priceBefore}\n`)
 
-    await manipulatePrice([ERC20_TOKEN, WETH_TOKEN], account)
+    await manipulatePrice([ERC20_TOKEN, WETH_TOKEN], wallet)
 
     // Fetch price of SHIB/WETH after the swap
     const priceAfter = await calculatePrice(pairContract)
@@ -92,7 +98,7 @@ const main = async () => {
 
     console.table(data)
 
-    let balance = ethers.utils.formatEther(await WETH_CONTRACT.balanceOf(account.address))
+    let balance = ethers.utils.formatEther(await WETH_CONTRACT.balanceOf(wallet.address))
     // balance = web3.utils.fromWei(balance.toString(), "ether")
 
     console.log(`\nBalance in reciever account: ${balance} WETH\n`)
@@ -107,21 +113,23 @@ async function manipulatePrice(tokens: Token[], account0: Wallet) {
 
     console.log(`Input Token: ${tokens[0].symbol}\n`)
     console.log(`Output Token: ${tokens[1].symbol}\n`)
-    const accounts = await ethers.getSigners()
-    const account1 = accounts[1] // this will be the account to swap shib to weth
+    const account2 = wallet2 // this will be the account to swap shib to weth
 
-    const ethAmount = ethers.utils.parseUnits("1000000", "ether")
-    console.log("ethAmount", ethAmount._hex)
-    await network.provider.send("hardhat_setBalance", [account1.address, ethAmount._hex])
+    const ethAmount = ethers.utils.parseUnits("100", "ether")
+    console.log("ethAmount", ethAmount.toString())
 
     // const amountIn = new web3.utils.BN(web3.utils.toWei(AMOUNT, "ether"))
-    const amountIn = await ethers.utils.parseUnits(AMOUNT, "ether")
+    const amountIn = await ethers.utils.parseEther("100")
     console.log(`Amount In: ${amountIn.toString()}\n`)
 
     const path = [tokens[0].address, tokens[1].address]
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20 // 20 minutes
 
-    await ERC20_CONTRACT.connect(account1).approve(V2_ROUTER_TO_USE.address, amountIn, {
+    await ERC20_CONTRACT.connect(account2).approve(V2_ROUTER_TO_USE.address, amountIn, {
+        gasLimit: GAS,
+    })
+
+    await WETH_CONTRACT.connect(account2).approve(V2_ROUTER_TO_USE.address, amountIn, {
         gasLimit: GAS,
     })
 
@@ -129,24 +137,40 @@ async function manipulatePrice(tokens: Token[], account0: Wallet) {
 
     // need to swap tokens to make sure there is enough SHIB in wallet to transfer to account0
 
-    const tx = await WETH_CONTRACT.connect(account1).deposit({
-        value: ethers.utils.parseEther("10"),
+    const tx = await WETH_CONTRACT.connect(account2).deposit({
+        value: amountIn,
         gasLimit: GAS,
     })
+
     await tx.wait(1)
 
-    const againstBalance = await ERC20_CONTRACT.balanceOf(account1.address)
-    const wethBalance = await WETH_CONTRACT.balanceOf(account1.address)
+    const wethBalance = await WETH_CONTRACT.balanceOf(account2.address)
 
-    console.log("wethBalance", wethBalance.toString())
-    console.log("againstBalance", againstBalance.toString())
+    const trade1Receipt = await V2_ROUTER_TO_USE.connect(account2).swapExactTokensForTokens(
+        wethBalance,
+        0,
+        path,
+        account2.address,
+        deadline,
+        {
+            gasLimit: GAS,
+        }
+    )
 
-    await ERC20_CONTRACT.connect(account1).transfer(account1.address, amountIn, {
+    await trade1Receipt.wait(1)
+
+    const againstBalance = await ERC20_CONTRACT.balanceOf(account2.address)
+
+    console.log("wethBalance", wethBalance.toString(), "\n")
+    console.log("againstBalance", againstBalance.toString(), "\n")
+
+    await ERC20_CONTRACT.connect(account2).transfer(account2.address, amountIn, {
         gasLimit: GAS,
     })
+
     console.log(`Transferred ${tokens[0].symbol} to account 1\n`)
 
-    const receipt = await V2_ROUTER_TO_USE.connect(account1).swapExactTokensForTokens(
+    const receipt = await V2_ROUTER_TO_USE.connect(account2).swapExactTokensForTokens(
         amountIn,
         0,
         path,

@@ -84,10 +84,11 @@ export const developmentChains = ["hardhat", "localhost"]
 export const VERIFICATION_BLOCK_CONFIRMATIONS = 6
 
 export const PROJECT_SETTINGS = {
-    isLocal: false,
+    isLocal: true,
     isDeployed: false,
     localUrl: "http://127.0.0.1:8545/",
     localPrivateKey: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
+    account2PrivateKey: "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d",
 }
 export const UNISWAP = {
     V2_ROUTER_02_ADDRESS: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",

@@ -91,17 +91,17 @@ export async function calculatePrice(_pairContract: IUniswapV2Pair) {
     const [reserve0, reserve1] = await getReserves(_pairContract)
     console.log("reserve0", reserve0.toString()) //shib
     console.log("reserve1", reserve1.toString()) // weth
-    const priceBN = new BN(reserve1.toString()).div(new BN(reserve0.toString()))
-    console.log("priceBN", priceBN.toString())
-    const price = (Number(reserve1.toString()) / Number(reserve0.toString())).toFixed(15)
+    const price = (Number(reserve1.toString()) / Number(reserve0.toString())).toFixed(20)
     console.log("price", price.toString())
-    return priceBN
+    return price
 }
 
-export function calculateDifference(uPrice: BN, sPrice: BN) {
-    const difference = uPrice.sub(sPrice).div(sPrice).mul(new BN(100))
-    console.log("difference", difference.toString())
-    return difference.toString()
+export function calculateDifference(uPrice: string, sPrice: string) {
+    // const difference = uPrice.sub(sPrice).div(sPrice).mul(new BN(100))
+    const difference = (((Number(uPrice) - Number(sPrice)) / Number(sPrice)) * 100).toFixed(18)
+    console.log("difference", difference)
+
+    return difference
 }
 
 export async function getEstimatedReturn(
