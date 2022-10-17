@@ -248,23 +248,24 @@ const determineProfitability = async (
 
         const amountDifference = amountOut.sub(amountIn)
         let wethBalanceBefore = await _token0Contract.balanceOf(account)
-        wethBalanceBefore = ethers.utils.parseUnits(wethBalanceBefore.toString(), "ether")
-
+        console.log("amountDifference string", amountDifference.toString())
         const wethBalanceAfter = amountDifference.add(wethBalanceBefore)
         const wethBalanceDifference = wethBalanceAfter.sub(wethBalanceBefore)
 
         const totalGained = wethBalanceDifference.sub(ethers.utils.parseEther(estimatedGasCost))
 
         const data = {
-            "ETH Balance Before": ethers.utils.formatEther(weiBalanceBefore.toString()),
-            "ETH Balance After": ethers.utils.formatEther(weiBalanceAfter.toString()),
+            "ETH Balance Before": ethers.utils.formatEther(weiBalanceBefore.toString()).toString(),
+            "ETH Balance After": ethers.utils.formatEther(weiBalanceAfter.toString()).toString(),
             "ETH Spent (gas)": estimatedGasCost.toString(),
             "-": {},
-            "WETH Balance BEFORE": ethers.utils.formatEther(wethBalanceBefore.toString()),
-            "WETH Balance AFTER": ethers.utils.formatEther(wethBalanceAfter.toString()),
-            "WETH Gained/Lost": ethers.utils.formatEther(wethBalanceDifference.toString()),
+            "WETH Balance BEFORE": ethers.utils.parseEther(wethBalanceBefore.toString()).toString(),
+            "WETH Balance AFTER": wethBalanceAfter.toString(),
+            "WETH Gained/Lost": ethers.utils
+                .formatEther(wethBalanceDifference.toString())
+                .toString(),
             "--": {},
-            "Total Gained/Lost": ethers.utils.formatEther(totalGained.toString()),
+            "Total Gained/Lost": ethers.utils.formatEther(totalGained.toString()).toString(),
         }
 
         console.table(data)
@@ -318,6 +319,7 @@ const executeTrade = async (
 
     // Fetch token balance after
     // have to use the erc20 contract to get the balance of the token
+    // track what is wei and what is eth
     const balanceAfter = await _token0Contract.balanceOf(account)
     const ethBalanceAfter = await provider.getBalance(account)
 

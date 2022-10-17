@@ -108,9 +108,9 @@ export async function getEstimatedReturn(
     const trade1 = await _routerPath[0].getAmountsOut(amount, [_token0.address, _token1.address])
     const trade2 = await _routerPath[1].getAmountsOut(trade1[1], [_token1.address, _token0.address])
     console.log("Available Trades\n")
-    console.log("Trade 1", trade1, "\n")
-    console.log("Trade 2", trade2, "\n")
-    const amountIn: BigNumber = await ethers.utils.parseUnits(trade1[0].toString(), "ether")
-    const amountOut: BigNumber = await ethers.utils.parseUnits(trade2[1].toString(), "ether")
+    console.log("WETH Amount in", trade1[0].toString(), "\n")
+    console.log("WETH Amount out", trade2[1].toString(), "\n")
+    const amountIn: BigNumber = await trade1[0]
+    const amountOut: BigNumber = await trade2[1]
     return { amountIn, amountOut }
 }
