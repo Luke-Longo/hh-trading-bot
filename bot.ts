@@ -133,9 +133,9 @@ const checkPrice = async (exchange: string, token0: Token, token1: Token) => {
     const uPrice = await calculatePrice(uPair)
     const sPrice = await calculatePrice(sPair)
 
-    const uFPrice = Number(Number(uPrice).toFixed(2))
-    const sFPrice = Number(Number(sPrice).toFixed(2))
-    const priceDifference = (((uFPrice - sFPrice) / sFPrice) * 100).toFixed(2)
+    const uFPrice = uPrice
+    const sFPrice = sPrice
+    const priceDifference = uFPrice.sub(sFPrice).div(sFPrice).mul(100).toNumber().toFixed(4)
 
     console.log(`Current Block: ${currentBlock}`)
     console.log(`-----------------------------------------`)
@@ -188,11 +188,7 @@ const determineProfitability = async (
     }
 
     console.log(`Reserves on ${_routerPath[1].address}`)
-    console.log(
-        `${tickerFor}: ${Number(ethers.utils.parseUnits(reserves[0].toString(), "ether")).toFixed(
-            0
-        )}`
-    )
+    console.log(`${tickerFor}: ${reserves[0].toString()}`)
     console.log(`WETH: ${ethers.utils.parseUnits(reserves[1].toString(), "ether")}\n`)
 
     try {
@@ -200,6 +196,7 @@ const determineProfitability = async (
         console.log("Getting amounts in")
 
         console.log(`reserves string ${reserves[0].toString()} \n`)
+        console.log(`reserves string ${reserves[1].toString()} \n`)
 
         let result = await _routerPath[0].getAmountsIn(reserves[0].toString(), [
             _token0.address,
@@ -241,9 +238,10 @@ const determineProfitability = async (
         const account = await wallet.getAddress()
 
         let weiBalanceBefore = await provider.getBalance(account)
-        console.log(`ETH Balance Before: ${ethers.utils.formatEther(weiBalanceBefore)}\n`)
+        console.log(` Balance Before: ${ethers.utils.formatEther(weiBalanceBefore)}\n`)
         console.log("Estimated Gas Cost", estimatedGasCost)
         const weiBalanceAfter = weiBalanceBefore.sub(ethers.utils.parseEther(estimatedGasCost))
+
         console.log(`WEI Balance After Transaction: ${weiBalanceAfter}\n`)
 
         const amountDifference = amountOut.sub(amountIn)

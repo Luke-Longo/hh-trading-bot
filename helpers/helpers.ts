@@ -82,7 +82,6 @@ export async function getPairContract(
 }
 
 export async function getReserves(_pairContract: IUniswapV2Pair) {
-    console.log("getting reserves")
     const reserves = await _pairContract.getReserves()
     return [reserves.reserve0, reserves.reserve1]
 }
@@ -90,12 +89,12 @@ export async function getReserves(_pairContract: IUniswapV2Pair) {
 export async function calculatePrice(_pairContract: IUniswapV2Pair) {
     console.log("calculating price")
     const [reserve0, reserve1] = await getReserves(_pairContract)
-    return (Number(reserve0.toString()) / Number(reserve1.toString())).toString()
+    return reserve0.div(reserve1)
 }
 
-export function calculateDifference(uPrice: number, sPrice: number) {
+export function calculateDifference(uPrice: BigNumber, sPrice: BigNumber) {
     console.log("calculating difference")
-    return (((uPrice - sPrice) / sPrice) * 100).toFixed(2)
+    return uPrice.sub(sPrice).div(sPrice).mul(100)
 }
 
 export async function getEstimatedReturn(
@@ -104,7 +103,6 @@ export async function getEstimatedReturn(
     _token0: Token,
     _token1: Token
 ) {
-    console.log("getting estimated return")
     const trade1 = await _routerPath[0].getAmountsOut(amount, [_token0.address, _token1.address])
     const trade2 = await _routerPath[1].getAmountsOut(trade1[1], [_token1.address, _token0.address])
     console.log("Available Trades\n")
