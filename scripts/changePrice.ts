@@ -5,17 +5,15 @@ dotenv.config()
 import { ethers, getNamedAccounts, network } from "hardhat"
 import { Token } from "@uniswap/sdk"
 
-import { abi as UniswapV2Router02ABI } from "@uniswap/v2-periphery/build/IUniswapV2Router02.json"
-import { abi as UniswapV2FactoryABI } from "@uniswap/v2-core/build/IUniswapV2Factory.json"
 import { abi as IERC20ABI } from "@openzeppelin/contracts/build/contracts/ERC20.json"
 import { abi as IWETHABI } from "../artifacts/contracts/interfaces/IWETH.sol/IWETH.json"
-import { IUniswapV2Factory, IUniswapV2Router02, IUniswapV2ERC20, IERC20, IWeth } from "../typechain"
+import { IUniswapV2ERC20, IWeth } from "../typechain"
+import { provider, uFactory, sFactory, uRouter, sRouter } from "../helpers/initialization"
+import { PROJECT_SETTINGS, UNISWAP, SUSHISWAP } from "../helper-hardhat-config"
 // -- SETUP NETWORK & WEB3 -- //
 
-const chainId = network.config.chainId
-const provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_RPC_URL)
-
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider)
+const chainId = 1
+const wallet = new Wallet(PROJECT_SETTINGS.localPrivateKey, provider)
 
 // -- IMPORT HELPER FUNCTIONS -- //
 
@@ -23,32 +21,7 @@ import { getPairContract, calculatePrice } from "../helpers/helpers"
 
 // -- IMPORT & SETUP UNISWAP/SUSHISWAP CONTRACTS -- //
 
-import config from "../config.json"
 import { Wallet } from "ethers"
-
-const uFactory = new ethers.Contract(
-    config.UNISWAP.FACTORY_ADDRESS,
-    UniswapV2FactoryABI,
-    provider
-) as IUniswapV2Factory // UNISWAP FACTORY CONTRACT
-
-const sFactory = new ethers.Contract(
-    config.SUSHISWAP.FACTORY_ADDRESS,
-    UniswapV2FactoryABI,
-    provider
-) as IUniswapV2Factory // SUSHISWAP FACTORY CONTRACT
-
-const uRouter = new ethers.Contract(
-    config.UNISWAP.V2_ROUTER_02_ADDRESS,
-    UniswapV2Router02ABI,
-    provider
-) as IUniswapV2Router02 // UNISWAP ROUTER CONTRACT
-
-const sRouter = new ethers.Contract(
-    config.SUSHISWAP.V2_ROUTER_02_ADDRESS,
-    UniswapV2Router02ABI,
-    provider
-) as IUniswapV2Router02 // UNISWAP ROUTER CONTRACT
 
 // -- CONFIGURE VALUES HERE -- //
 

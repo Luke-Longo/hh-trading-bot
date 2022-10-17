@@ -4,6 +4,7 @@ dotenv.config()
 
 import { ethers } from "hardhat"
 import { PROJECT_SETTINGS, SUSHISWAP, UNISWAP } from "../helper-hardhat-config"
+import BN from "bn.js"
 
 export let provider: JsonRpcProvider
 if (!PROJECT_SETTINGS.isLocal) {
@@ -90,15 +91,17 @@ export async function calculatePrice(_pairContract: IUniswapV2Pair) {
     const [reserve0, reserve1] = await getReserves(_pairContract)
     console.log("reserve0", reserve0.toString()) //shib
     console.log("reserve1", reserve1.toString()) // weth
-    const price = Number(reserve1.toString()) / Number(reserve0.toString())
+    const priceBN = new BN(reserve1.toString()).div(new BN(reserve0.toString()))
+    console.log("priceBN", priceBN.toString())
+    const price = (Number(reserve1.toString()) / Number(reserve0.toString())).toFixed(15)
     console.log("price", price.toString())
-    return price
+    return priceBN
 }
 
-export function calculateDifference(uPrice: BigNumber, sPrice: BigNumber) {
-    const difference = uPrice.sub(sPrice).div(sPrice).mul(100)
+export function calculateDifference(uPrice: BN, sPrice: BN) {
+    const difference = uPrice.sub(sPrice).div(sPrice).mul(new BN(100))
     console.log("difference", difference.toString())
-    return difference
+    return difference.toString()
 }
 
 export async function getEstimatedReturn(

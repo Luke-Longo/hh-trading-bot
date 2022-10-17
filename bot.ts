@@ -10,8 +10,10 @@ import {
     calculatePrice,
     getEstimatedReturn,
     getReserves,
+    calculateDifference,
 } from "./helpers/helpers"
 import { BigNumber } from "ethers"
+import BN from "bn.js"
 import {
     uFactory,
     uRouter,
@@ -133,14 +135,15 @@ const checkPrice = async (exchange: string, token0: Token, token1: Token) => {
     const uPrice = await calculatePrice(uPair)
     const sPrice = await calculatePrice(sPair)
 
-    const uFPrice = BigNumber.from(uPrice)
-    const sFPrice = BigNumber.from(sPrice)
-    const priceDifference = uFPrice.sub(sFPrice).div(sFPrice).mul(100).toNumber().toFixed(4)
+    // const uFPrice = Number(uPrice).toFixed(Number(units))
+    // const sFPrice = Number(sPrice).toFixed(Number(units))
+    const priceDifference = calculateDifference(uPrice, sPrice)
+    // const priceDifference = calculateDifference(uFPrice, sFPrice)
 
     console.log(`Current Block: ${currentBlock}`)
     console.log(`-----------------------------------------`)
-    console.log(`UNISWAP   | ${token1.symbol}/${token0.symbol}\t | ${uFPrice}`)
-    console.log(`SUSHISWAP | ${token1.symbol}/${token0.symbol}\t | ${sFPrice}\n`)
+    console.log(`UNISWAP   | ${token1.symbol}/${token0.symbol}\t | ${uPrice.toString()}`)
+    console.log(`SUSHISWAP | ${token1.symbol}/${token0.symbol}\t | ${sPrice.toString()}\n`)
     console.log(`Percentage Difference: ${priceDifference}%\n`)
 
     return priceDifference

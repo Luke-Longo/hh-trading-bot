@@ -58,6 +58,7 @@
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "babel-eslint": "^10.1.0",
     "big.js": "^6.2.1",
+    "bn.js": "^5.2.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.18.2",
