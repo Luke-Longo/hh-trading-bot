@@ -133,8 +133,8 @@ const checkPrice = async (exchange: string, token0: Token, token1: Token) => {
     const uPrice = await calculatePrice(uPair)
     const sPrice = await calculatePrice(sPair)
 
-    const uFPrice = uPrice
-    const sFPrice = sPrice
+    const uFPrice = BigNumber.from(uPrice)
+    const sFPrice = BigNumber.from(sPrice)
     const priceDifference = uFPrice.sub(sFPrice).div(sFPrice).mul(100).toNumber().toFixed(4)
 
     console.log(`Current Block: ${currentBlock}`)

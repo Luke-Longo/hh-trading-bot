@@ -26,8 +26,6 @@ import { JsonRpcProvider } from "@ethersproject/providers"
 import { BigNumber } from "ethers"
 
 export async function getTokenAndContract(_token0Address: string, _token1Address: string) {
-    console.log("getTokenAndContract")
-
     const token0Contract: IUniswapV2ERC20 = (await new ethers.Contract(
         _token0Address,
         UniERC20.abi,
@@ -62,7 +60,6 @@ export async function getPairAddress(
     _token0: string,
     _token1: string
 ) {
-    console.log("get pair address")
     const pairAddress = await _V2Factory.connect(provider).getPair(_token0, _token1)
     return pairAddress
 }
@@ -82,19 +79,26 @@ export async function getPairContract(
 }
 
 export async function getReserves(_pairContract: IUniswapV2Pair) {
+    // will get the reserves of the pair
     const reserves = await _pairContract.getReserves()
     return [reserves.reserve0, reserves.reserve1]
 }
 
 export async function calculatePrice(_pairContract: IUniswapV2Pair) {
-    console.log("calculating price")
+    // you get the reserves on each pair contract and divide the reserves to get the price
+    // reserves 0 is shib and reserves 1 is eth
     const [reserve0, reserve1] = await getReserves(_pairContract)
-    return reserve0.div(reserve1)
+    console.log("reserve0", reserve0.toString()) //shib
+    console.log("reserve1", reserve1.toString()) // weth
+    const price = Number(reserve1.toString()) / Number(reserve0.toString())
+    console.log("price", price.toString())
+    return price
 }
 
 export function calculateDifference(uPrice: BigNumber, sPrice: BigNumber) {
-    console.log("calculating difference")
-    return uPrice.sub(sPrice).div(sPrice).mul(100)
+    const difference = uPrice.sub(sPrice).div(sPrice).mul(100)
+    console.log("difference", difference.toString())
+    return difference
 }
 
 export async function getEstimatedReturn(
@@ -106,8 +110,8 @@ export async function getEstimatedReturn(
     const trade1 = await _routerPath[0].getAmountsOut(amount, [_token0.address, _token1.address])
     const trade2 = await _routerPath[1].getAmountsOut(trade1[1], [_token1.address, _token0.address])
     console.log("Available Trades\n")
-    console.log("WETH Amount in", trade1[0].toString(), "\n")
-    console.log("WETH Amount out", trade2[1].toString(), "\n")
+    console.log("Amount in", trade1[0].toString(), "\n")
+    console.log("Amount out", trade2[1].toString(), "\n")
     const amountIn: BigNumber = await trade1[0]
     const amountOut: BigNumber = await trade2[1]
     return { amountIn, amountOut }
