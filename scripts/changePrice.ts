@@ -110,30 +110,28 @@ main()
 
 async function manipulatePrice(tokens: Token[], account0: Wallet) {
     console.log(`\nBeginning Swap...\n`)
-
     console.log(`Input Token: ${tokens[0].symbol}\n`)
     console.log(`Output Token: ${tokens[1].symbol}\n`)
     const account2 = wallet2 // this will be the account to swap shib to weth
 
-    const ethAmount = ethers.utils.parseUnits("100", "ether")
-    console.log("ethAmount", ethAmount.toString())
-
     // const amountIn = new web3.utils.BN(web3.utils.toWei(AMOUNT, "ether"))
-    const amountIn = await ethers.utils.parseEther("100")
+    const amountIn = await ethers.utils.parseEther("900")
+
     console.log(`Amount In: ${amountIn.toString()}\n`)
 
     const path = [tokens[0].address, tokens[1].address]
+
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20 // 20 minutes
 
     await ERC20_CONTRACT.connect(account2).approve(V2_ROUTER_TO_USE.address, amountIn, {
         gasLimit: GAS,
     })
-
     await WETH_CONTRACT.connect(account2).approve(V2_ROUTER_TO_USE.address, amountIn, {
         gasLimit: GAS,
     })
 
     console.log(`Approved ${tokens[0].symbol} for swap\n`)
+    console.log(`Approved ${tokens[1].symbol} for swap\n`)
 
     // need to swap tokens to make sure there is enough SHIB in wallet to transfer to account0
 
@@ -146,10 +144,16 @@ async function manipulatePrice(tokens: Token[], account0: Wallet) {
 
     const wethBalance = await WETH_CONTRACT.balanceOf(account2.address)
 
+    console.log("wethBalance", wethBalance.toString(), "\n")
+
+    console.log(`Swapping ${amountIn.toString()} ${tokens[1].symbol} for ${tokens[0].symbol}... \n`)
+
+    const reversePath = [tokens[1].address, tokens[0].address]
+
     const trade1Receipt = await V2_ROUTER_TO_USE.connect(account2).swapExactTokensForTokens(
         wethBalance,
         0,
-        path,
+        reversePath,
         account2.address,
         deadline,
         {
@@ -186,8 +190,3 @@ async function manipulatePrice(tokens: Token[], account0: Wallet) {
 
     return receipt
 }
-
-// await hre.network.provider.request({
-//     method: "hardhat_impersonateAccount",
-//     params: ["0x364d6D0333432C3Ac016Ca832fb8594A8cE43Ca6"],
-// })

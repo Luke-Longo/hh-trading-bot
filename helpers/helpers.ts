@@ -89,8 +89,8 @@ export async function calculatePrice(_pairContract: IUniswapV2Pair) {
     // you get the reserves on each pair contract and divide the reserves to get the price
     // reserves 0 is shib and reserves 1 is eth
     const [reserve0, reserve1] = await getReserves(_pairContract)
-    console.log("reserve0", reserve0.toString()) //shib
-    console.log("reserve1", reserve1.toString()) // weth
+    console.log("reserve0", reserve0.toString(), "\n") //shib
+    console.log("reserve1", reserve1.toString(), "\n") // weth
     const price = (Number(reserve1.toString()) / Number(reserve0.toString())).toFixed(20)
     console.log("price", price.toString())
     return price

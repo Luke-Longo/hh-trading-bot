@@ -190,16 +190,12 @@ const determineProfitability = async (
         exchangeToSell = "Uniswap"
     }
 
-    console.log(`Reserves on ${_routerPath[1].address}`)
-    console.log(`${tickerFor}: ${reserves[0].toString()}`)
-    console.log(`WETH: ${ethers.utils.parseUnits(reserves[1].toString(), "ether")}\n`)
+    console.log(`Reserves 0: ${reserves[0].toString()} \n`)
+    console.log(`Reserves 1: ${reserves[1].toString()}\n`)
 
     try {
         // This returns the amount of WETH needed
         console.log("Getting amounts in")
-
-        console.log(`reserves string ${reserves[0].toString()} \n`)
-        console.log(`reserves string ${reserves[1].toString()} \n`)
 
         let result = await _routerPath[0].getAmountsIn(reserves[0].toString(), [
             _token0.address,
