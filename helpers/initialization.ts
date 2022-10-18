@@ -24,7 +24,7 @@ if (!PROJECT_SETTINGS.isLocal) {
 
 const getBalance = async () => {
     const balance = ethers.utils.formatEther(await wallet.getBalance())
-    console.log("balance: " + balance)
+    console.log("balance: " + balance, "\n")
 }
 
 getBalance()

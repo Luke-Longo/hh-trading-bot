@@ -13,7 +13,6 @@ import {
     calculateDifference,
 } from "./helpers/helpers"
 import { BigNumber } from "ethers"
-import BN from "bn.js"
 import {
     uFactory,
     uRouter,
@@ -179,6 +178,7 @@ const determineProfitability = async (
     // This is a basic example of trading WETH/SHIB...
 
     let reserves: BigNumber[], exchangeToBuy: string, exchangeToSell: string
+
     // checking to see which path is being used
     if (_routerPath[0].address == uRouter.address) {
         reserves = await getReserves(sPair)
@@ -190,14 +190,39 @@ const determineProfitability = async (
         exchangeToSell = "Uniswap"
     }
 
-    console.log(`Reserves 0: ${reserves[0].toString()} \n`)
+    console.log(`Reserves 0: ${reserves[0].toString()}\n`)
     console.log(`Reserves 1: ${reserves[1].toString()}\n`)
 
     try {
         // This returns the amount of WETH needed
-        console.log("Getting amounts in")
+        console.log("Getting amounts in \n")
 
-        let result = await _routerPath[0].getAmountsIn(reserves[0].toString(), [
+        let sReserves = await sPair.getReserves()
+        let uReserves = await uPair.getReserves()
+        // This will error if the reserves on the exchange are too low
+        // basically if sushiswap has less reserves than uniswap
+
+        if (sReserves[0] < uReserves[0] || sReserves[1] < uReserves[1]) {
+            console.log("Reserves too low \n")
+            let amountIn = await _routerPath[0].getAmountsIn(
+                ethers.utils.parseUnits("1", _token0.decimals),
+                [_token0.address, _token1.address]
+            )
+            console.log(`Amount In: ${amountIn[0].toString()}\n`)
+            console.log(`Amount Out: ${amountIn[1].toString()}\n`)
+            // get amount in will return the amount out based on the amounts sending into the transaction
+            // look into and understand trade routing with uniswap
+            let result = await _routerPath[1].getAmountIn(
+                reserves[0],
+                _token0.address,
+                _token1.address
+            )
+            console.log(`result: ${result.toString()}\n`)
+        } else {
+            console.log("Reserves are good")
+        }
+
+        let result = await _routerPath[0].getAmountsIn(reserves[0], [
             _token0.address,
             _token1.address,
         ])
