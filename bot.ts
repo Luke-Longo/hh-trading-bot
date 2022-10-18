@@ -134,8 +134,9 @@ const checkPrice = async (exchange: string, token0: Token, token1: Token) => {
     const uPrice = await calculatePrice(uPair)
     const sPrice = await calculatePrice(sPair)
 
-    // const uFPrice = Number(uPrice).toFixed(Number(units))
-    // const sFPrice = Number(sPrice).toFixed(Number(units))
+    const uFPrice = Number(uPrice).toFixed(Number(units))
+    const sFPrice = Number(sPrice).toFixed(Number(units))
+
     const priceDifference = calculateDifference(uPrice, sPrice)
     // const priceDifference = calculateDifference(uFPrice, sFPrice)
 
@@ -181,6 +182,7 @@ const determineProfitability = async (
 
     // checking to see which path is being used
     if (_routerPath[0].address == uRouter.address) {
+        // if the first router in the path is uniswap then you will get the reserves in sushiswap
         reserves = await getReserves(sPair)
         exchangeToBuy = "Uniswap"
         exchangeToSell = "Sushiswap"
@@ -189,9 +191,9 @@ const determineProfitability = async (
         exchangeToBuy = "Sushiswap"
         exchangeToSell = "Uniswap"
     }
-
-    console.log(`Reserves 0: ${reserves[0].toString()}\n`)
-    console.log(`Reserves 1: ${reserves[1].toString()}\n`)
+    console.log(`Reserves on ${_routerPath[1].address} \n`)
+    console.log(`${arbAgainst} Reserves: ${reserves[0].toString()}\n`)
+    console.log(`WETH Reserves: ${reserves[1].toString()}\n`)
 
     try {
         // This returns the amount of WETH needed
