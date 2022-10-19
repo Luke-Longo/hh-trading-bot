@@ -32,11 +32,13 @@ export async function getTokenAndContract(_token0Address: string, _token1Address
         UniERC20.abi,
         provider
     )) as IUniswapV2ERC20
+
     const token1Contract: IUniswapV2ERC20 = (await new ethers.Contract(
         _token1Address,
         UniERC20.abi,
         provider
     )) as IUniswapV2ERC20
+
     const token0 = new Token(
         ChainId.MAINNET,
         _token0Address,
@@ -87,16 +89,15 @@ export async function getReserves(_pairContract: IUniswapV2Pair) {
 
 export async function calculatePrice(_pairContract: IUniswapV2Pair) {
     // you get the reserves on each pair contract and divide the reserves to get the price
-    // reserves 0 is shib and reserves 1 is eth
     const [reserve0, reserve1] = await getReserves(_pairContract)
-    const price = (Number(reserve1.toString()) / Number(reserve0.toString())).toFixed(20)
+    const price = (Number(reserve0.toString()) / Number(reserve1.toString())).toFixed(18)
     console.log("price", price, "\n")
     return price
 }
 
 export function calculateDifference(uPrice: string, sPrice: string) {
     // const difference = uPrice.sub(sPrice).div(sPrice).mul(new BN(100))
-    const difference = (((Number(uPrice) - Number(sPrice)) / Number(sPrice)) * 100).toFixed(4)
+    const difference = (((Number(uPrice) - Number(sPrice)) / Number(sPrice)) * 100).toFixed(2)
 
     return difference
 }
@@ -107,6 +108,7 @@ export async function getEstimatedReturn(
     _token0: Token,
     _token1: Token
 ) {
+    // look at the trades and call the getAmountsOut function using the input amount and the path, then use that result to call the getAmountsOut function using the output of arbAgainst token
     const trade1 = await _routerPath[0].getAmountsOut(amount, [_token0.address, _token1.address])
     const trade2 = await _routerPath[1].getAmountsOut(trade1[1], [_token1.address, _token0.address])
     console.log("Available Trades\n")
