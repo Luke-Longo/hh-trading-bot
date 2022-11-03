@@ -2,5 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as arbitrageSol from "./Arbitrage.sol";
+export * as bundleExecutorSol from "./BundleExecutor.sol";
 export * as interfaces from "./interfaces";
 export { Migrations__factory } from "./Migrations__factory";
