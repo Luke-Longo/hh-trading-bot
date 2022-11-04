@@ -44,7 +44,7 @@ error BundleExecutor__OnlyOwner(address owner, address caller);
 error BundleExecutor__OnlyExecutor(address executor, address caller);
 error BundleExecutor__CallFailed();
 error BundleExecutor__InvalidCallAddress();
-error BundleExecutor__NoProfit(uint256 loss);
+error BundleExecutor__NoProfit();
 error BundleExecutor__SwapFailed(address target, bytes data);
 
 contract FlashBotsMultiCall {
@@ -108,6 +108,7 @@ contract FlashBotsMultiCall {
         console.log("_wethAmountToFirstMarket: ", _wethAmountToFirstMarket);
         WETH.transfer(_targets[0], _wethAmountToFirstMarket);
         console.log("WETH trasfer success");
+        console.log("_targets.length: ", _targets.length);
         for (uint256 i = 0; i < _targets.length; i++) {
             console.log("BundleExecutor__uniswapWeth__call", i);
             (bool _success, bytes memory _response) = _targets[i].call(_payloads[i]);
@@ -121,10 +122,8 @@ contract FlashBotsMultiCall {
 
         console.log("wethBalanceAfter", _wethBalanceAfter);
 
-        if (!(_wethBalanceAfter > _wethBalanceBefore + _ethAmountToCoinbase)) {
-            revert BundleExecutor__NoProfit(
-                _wethBalanceAfter - (_wethBalanceBefore + _ethAmountToCoinbase)
-            );
+        if (!(_wethBalanceAfter > (_wethBalanceBefore + _ethAmountToCoinbase))) {
+            revert BundleExecutor__NoProfit();
         }
 
         console.log("_eth amount to coinbase", _ethAmountToCoinbase);
@@ -138,7 +137,7 @@ contract FlashBotsMultiCall {
             WETH.withdraw(_ethAmountToCoinbase - _ethBalance);
         }
 
-        console.log("profit: ", _wethBalanceAfter - (_wethBalanceBefore + _ethAmountToCoinbase));
+        console.log("made profit");
         // this line of code makes sure that you are paying the miner for the transaction, and enables you to send eth to the coinbase only if you meet certain conditions
         // if (some other condition != true) return;
         // if (some state != whatever) {
