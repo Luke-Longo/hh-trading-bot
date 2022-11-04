@@ -37,7 +37,7 @@ const config: HardhatUserConfig = {
                 // blockNumber: Number(FORKING_BLOCK_NUMBER),
                 enabled: true,
             },
-            chainId: 31337,
+            chainId: 1,
         },
         localhost: {
             chainId: 31337,

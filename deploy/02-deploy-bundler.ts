@@ -13,7 +13,7 @@ const deploy: DeployFunction = async function (hre) {
     const chainId = await getChainId()
     console.log("chainId", chainId)
     log("--------------------")
-    const args = ["0x18193fbafc242Cd543a578FEE6d0B0dB9B2641F1"]
+    const args = ["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"]
     const deployResult = await deploy("FlashBotsMultiCall", {
         from: deployer,
         args,
