@@ -43,6 +43,9 @@ interface IWETH is IERC20 {
 error BundleExecutor__OnlyOwner(address owner, address caller);
 error BundleExecutor__OnlyExecutor(address executor, address caller);
 error BundleExecutor__CallFailed();
+error BundleExecutor__InvalidCallAddress();
+error BundleExecutor__NoProfit(uint256 loss);
+error BundleExecutor__SwapFailed(address target, bytes data);
 
 contract FlashBotsMultiCall {
     address private immutable owner;
@@ -106,31 +109,41 @@ contract FlashBotsMultiCall {
         WETH.transfer(_targets[0], _wethAmountToFirstMarket);
         console.log("WETH trasfer success");
         for (uint256 i = 0; i < _targets.length; i++) {
-            console.log("BundleExecutor__uniswapWeth__call");
+            console.log("BundleExecutor__uniswapWeth__call", i);
             (bool _success, bytes memory _response) = _targets[i].call(_payloads[i]);
-            require(_success, "transfer failed");
+            if (!_success) {
+                revert BundleExecutor__SwapFailed(_targets[i], _payloads[i]);
+            }
             _response;
         }
 
         uint256 _wethBalanceAfter = WETH.balanceOf(address(this));
-        console.log("BundleExecutor__uniswapWeth__wethBalanceAfter", _wethBalanceAfter);
-        require(
-            _wethBalanceAfter > _wethBalanceBefore + _ethAmountToCoinbase,
-            "did not make profit"
-        );
+
+        console.log("wethBalanceAfter", _wethBalanceAfter);
+
+        if (!(_wethBalanceAfter > _wethBalanceBefore + _ethAmountToCoinbase)) {
+            revert BundleExecutor__NoProfit(
+                _wethBalanceAfter - (_wethBalanceBefore + _ethAmountToCoinbase)
+            );
+        }
+
         console.log("_eth amount to coinbase", _ethAmountToCoinbase);
+
         if (_ethAmountToCoinbase == 0) return;
 
         uint256 _ethBalance = address(this).balance;
+        // this line looks at the contract balance and checks if it can pay the eth, if not then it will withdraw the diffenece from weth, since you know you already made a profit this should not eat into your margins and make you lose money
+
         if (_ethBalance < _ethAmountToCoinbase) {
             WETH.withdraw(_ethAmountToCoinbase - _ethBalance);
         }
+
+        console.log("profit: ", _wethBalanceAfter - (_wethBalanceBefore + _ethAmountToCoinbase));
         // this line of code makes sure that you are paying the miner for the transaction, and enables you to send eth to the coinbase only if you meet certain conditions
         // if (some other condition != true) return;
         // if (some state != whatever) {
         //  _ethAmountToCoinbase = 10; increase the amount of eth you are sending to the miner
         // }
-        console.log("BundleExecutor__uniswapWeth__transfer__coinbase");
         block.coinbase.transfer(_ethAmountToCoinbase);
     }
 
@@ -140,7 +153,9 @@ contract FlashBotsMultiCall {
         bytes calldata _data
     ) external payable onlyOwner returns (bytes memory) {
         console.log("BundleExecutor__call");
-        require(_to != address(0), "BundleExecutor: cannot call zero address");
+        if (_to == address(0)) {
+            revert BundleExecutor__InvalidCallAddress();
+        }
         (bool _success, bytes memory _result) = _to.call{value: _value}(_data);
         if (!_success) {
             revert BundleExecutor__CallFailed();
