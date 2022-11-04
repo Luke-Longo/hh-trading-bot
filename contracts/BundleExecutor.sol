@@ -87,11 +87,21 @@ contract FlashBotsMultiCall {
             _targets.length == _payloads.length,
             "BundleExecutor: targets and payloads length mismatch"
         );
-        console.log("BundleExecutor__uniswapWeth");
+
+        if (msg.value > 0) {
+            console.log("depositing eth into weth");
+            WETH.deposit{value: msg.value}();
+        }
+
         uint256 _wethBalanceBefore = WETH.balanceOf(address(this));
-        console.log("_wethBalanceBefore: ", _wethBalanceBefore);
+
+        if (_wethBalanceBefore < _wethAmountToFirstMarket) {
+            console.log("BundleExecutor: insufficient WETH balance");
+            WETH.deposit{value: address(this).balance}();
+        }
         // optimistically transfer WETH to the first market
         // uni v2 does not take any eth directly from you, instead you can send eth to it and you will ask for the other token instead
+
         console.log("_wethAmountToFirstMarket: ", _wethAmountToFirstMarket);
         WETH.transfer(_targets[0], _wethAmountToFirstMarket);
         console.log("WETH trasfer success");
